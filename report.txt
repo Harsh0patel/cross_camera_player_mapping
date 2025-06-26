@@ -1,0 +1,21 @@
+1) The Idea
+The core approach involves training a YOLOv11 model to detect players and referees in soccer match footage.
+Then, a pretrained ReID model is used to extract player-specific features (e.g., clothing color, appearance embedding) from each frame.
+DeepSORT tracking assigns local IDs per view. Cosine similarity between feature embeddings across views is used to match players and assign consistent global IDs.
+
+2) Challenges
+Initially, understanding and implementing YOLO and ReID models took time, as this was my first experience with them. 
+Learning how to apply and integrate these models was the most time-consuming part.
+
+Once that was in place, I encountered issues with inconsistent ID assignments and false-positive bounding boxes. 
+I addressed this by applying a confidence threshold (≥ 0.5) to reduce noise.
+
+The biggest challenge was achieving stable cross-view global ID mapping — some players were still mismatched or unmatched, 
+especially when detection failed or appearances were similar.
+
+3) Is This Task Fully Done?
+No — not yet. While the current system tracks players and assigns reasonably consistent global IDs across two views, it’s not yet robust enough for real-world deployment.
+
+I believe the solution can be improved by using the ball's position as a universal anchor.
+This would allow more reliable matching using both spatial and appearance information.
+While I haven’t implemented that yet due to lack of experience in spatial modeling, I plan to explore it further using LLMs and tutorials to learn quickly.

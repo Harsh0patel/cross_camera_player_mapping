@@ -1,10 +1,10 @@
 # Player Multi-View Tracking and ID Assignment
 
-This project performs player detection, tracking, and consistent ID assignment across two video views (e.g., front and side cameras). It uses YOLOv11 for object detection, DeepSORT for tracking, and cosine similarity on deep features to match players across different angles.
+This project performs player detection, tracking, and consistent ID assignment across two video views (e.g., front and side cameras). It uses YOLO for object detection, DeepSORT for tracking, and cosine similarity on deep features to match players across different angles.
 
 ---
 
-## 📁 Project Structure
+## Project Structure
 
 ```
 .
@@ -23,7 +23,7 @@ This project performs player detection, tracking, and consistent ID assignment a
 
 ---
 
-## 🚀 How It Works
+## How It Works
 
 ### 1. Detection + Tracking
 
@@ -52,7 +52,21 @@ This project performs player detection, tracking, and consistent ID assignment a
 
 ---
 
-## 🧾 Requirements
+## Techniques We Tried
+
+* YOLOv11 for robust detection (ball, player, referee, goalkeeper)
+* DeepSORT for local tracking with stable track IDs
+* OSNet from TorchreID for person ReID feature extraction
+* Cosine similarity to match identities between views
+* Class filtering to only match `player` class
+* Smoothed bounding boxes using a frame buffer
+* Local fallback IDs for unmatched players (10000+track\_id)
+* Confidence and size thresholds to remove noise
+* Frame-based consistency to skip 1-frame flickers
+
+---
+
+## Requirements
 
 Install dependencies with:
 
@@ -60,7 +74,27 @@ Install dependencies with:
 pip install -r requirements.txt
 ```
 
-## ✅ Features
+## Usage
+
+```python
+# Step 1: Detect and track with YOLO and DeepSORT
+# Already done in your preprocessed video and JSONs
+
+# Step 2: Extract features (only class 2 - players)
+extract_features('detections/front.json', 'front.mp4', 'features/front.npy')
+extract_features('detections/side.json', 'side.mp4', 'features/side.npy')
+
+# Step 3: Match across views
+match_tracks('features/front.npy', 'features/side.npy', 'matches/global_id_map.json')
+
+# Step 4: Render videos
+render_video('front.mp4', 'detections/front.json', global_id_map, 'output/front_output.mp4')
+render_video('side.mp4', 'detections/side.json', global_id_map, 'output/side_output.mp4')
+```
+
+---
+
+## Features
 
 * Player-only global ID mapping
 * Robust to occlusions and short-term missing detections
@@ -70,7 +104,7 @@ pip install -r requirements.txt
 
 ---
 
-## 🔍 Class Mapping Used
+## Class Mapping Used
 
 ```python
 CLASS_NAMES = {
@@ -83,10 +117,11 @@ CLASS_NAMES = {
 
 ---
 
-## 📌 Notes
+## Notes
 
 * This project focuses on visual consistency, not physical tracking (e.g., world coordinates)
-* I can improve matching using ball or cameraman as spatial reference but i really don't work in that parts so i don't know how to implement in code
+* i can later improve matching using ball or cameraman as spatial reference
 * Currently IDs are consistent only for players (class 2)
+* and there are some misclassified errors
 
 ---
